@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<h1>📊 Dashboard</h1>
+
+<!-- MAIN STATS -->
+<div class="cards">
+  <div class="card">Completion<br><b>{{completion}}%</b></div>
+  <div class="card">Learning Hours<br><b>{{total_hours}}</b></div>
+  <div class="card">🔥 Streak<br><b>{{streak}}</b></div>
+</div>
+
+<!-- GAMIFICATION -->
+<h2>🎮 Gamification</h2>
+<div class="cards">
+  <div class="card">XP<br><b>{{xp}}</b></div>
+  <div class="card">Level<br><b>{{level}}</b></div>
+</div>
+
+<div class="progress-bar">
+  <div class="progress" style="width: {{xp_progress}}%"></div>
+</div>
+<p>{{xp_progress}} / 100 XP to next level</p>
+
+<!-- GOAL -->
+<h2>⏳ 90 Day Goal</h2>
+<div class="progress-bar">
+  <div class="progress" style="width: {{progress}}%"></div>
+</div>
+<p>{{progress}}% completed | {{days_left}} days left</p>
+
+<form method="POST" action="/set_goal">
+  <input type="date" name="start" required>
+  <input type="date" name="end" required>
+  <button>Set Goal</button>
+</form>
+
+
+<script>
+function checkReminder() {
+  const now = new Date();
+  const hours = now.getHours();
+
+  // After 8 PM
+  if (hours >= 20) {
+    const incompleteTasks = {{ incomplete_tasks | default(0) }};
+
+    if (incompleteTasks > 0) {
+      alert("⚠️ You still have " + incompleteTasks + " tasks pending! Finish before day ends!");
+    }
+  }
+}
+
+// Check every minute
+setInterval(checkReminder, 60000);
+</script>
+
+
+<br>
+<a href="/">⬅ Back Home</a>
+
+</body>
+</html>

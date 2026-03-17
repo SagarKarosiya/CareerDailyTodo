@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Learning</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<h1>📘 Learning Tracker</h1>
+
+<form method="POST">
+  <input type="text" name="topic" placeholder="Course Name" required>
+  <input type="number" name="hours" placeholder="Hours" step="0.5" required>
+
+  <select name="platform" required>
+    <option value="">Select Platform</option>
+    <option value="Coursera">Coursera</option>
+    <option value="Great Learning">Great Learning</option>
+    <option value="LinkedIn Learning">LinkedIn Learning</option>
+  </select>
+
+  <button>Add</button>
+</form>
+
+<!-- Sections -->
+<h2>🎓 Coursera</h2>
+<div class="cards">
+  {% for d in data %}
+    {% if d[3] == "Coursera" %}
+    <div class="card">
+      <b>{{ d[1] }}</b><br>
+      Hours: {{ d[2] }}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<h2>📘 Great Learning</h2>
+<div class="cards">
+  {% for d in data %}
+    {% if d[3] == "Great Learning" %}
+    <div class="card">
+      <b>{{ d[1] }}</b><br>
+      Hours: {{ d[2] }}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<h2>💼 LinkedIn Learning</h2>
+<div class="cards">
+  {% for d in data %}
+    {% if d[3] == "LinkedIn Learning" %}
+    <div class="card">
+      <b>{{ d[1] }}</b><br>
+      Hours: {{ d[2] }}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<h2>📊 Platform Analytics</h2>
+
+<div class="card">
+  <canvas id="platformChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById('platformChart');
+
+  new Chart(ctx, {
+ /*   type: 'bar',  */
+    type: 'pie',
+    data: {
+      labels: {{ labels | tojson }},
+      datasets: [{
+        label: 'Hours Spent',
+        data: {{ values | tojson }}
+      }]
+    }
+  });
+</script>
+
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 Sagar Karosiya | Portfolio</p>
+</footer>
+
+
+</body>
+</html>
