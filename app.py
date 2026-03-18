@@ -125,6 +125,8 @@ def run_scheduler():
 # 🏠 HOME (Landing Page)
 @app.route("/")
 def home():
+    if current_user.is_authenticated:
+        return render_template("index.html", username=current_user.username)
     return render_template("index.html")
 
 # ---------------- AUTH ----------------
