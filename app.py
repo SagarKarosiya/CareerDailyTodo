@@ -90,7 +90,7 @@ def init_db():
 @app.route("/")
 def home():
     if current_user.is_authenticated:
-        return redirect("/dashboard")   # logged in user
+        return redirect("/index")   # logged in user
     return redirect("/login")           # not logged in
 
 # ---------------- LOAD USER ----------------
