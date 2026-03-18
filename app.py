@@ -85,6 +85,13 @@ def init_db():
 
     conn.commit()
     conn.close()
+    
+# ---------------- Home  ----------------
+@app.route("/")
+def home():
+    if current_user.is_authenticated:
+        return redirect("/dashboard")   # logged in user
+    return redirect("/login")           # not logged in
 
 # ---------------- LOAD USER ----------------
 @login_manager.user_loader
@@ -268,4 +275,4 @@ def dashboard():
 if __name__ == "__main__":
     init_db()
     threading.Thread(target=run_scheduler, daemon=True).start()
-    app.run(host="0.0.0.0", port=10000)
+    app.run(debug=True)
