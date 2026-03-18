@@ -125,9 +125,47 @@ def run_scheduler():
 # 🏠 HOME (Landing Page)
 @app.route("/")
 def home():
-    if current_user.is_authenticated:
-        return render_template("index.html", username=current_user.username)
-    return render_template("index.html")
+    if not current_user.is_authenticated:
+        return render_template("index.html")
+
+    conn = connect_db()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM tasks WHERE user_id=%s", (current_user.id,))
+    tasks = c.fetchall()
+
+    c.execute("SELECT * FROM learning WHERE user_id=%s", (current_user.id,))
+    learning = c.fetchall()
+
+    done_tasks = [t for t in tasks if t[2] == "Done"]
+    progress = (len(done_tasks)/len(tasks)*100) if tasks else 0
+
+    xp = len(done_tasks)*10
+    level = xp // 100
+    streak = 5  # placeholder
+    days_left = 90  # placeholder
+
+    data30 = [10,20,30]
+    data60 = [20,40,60]
+    data90 = [30,60,90]
+
+    incomplete_tasks = len([t for t in tasks if t[2] != "Done"])
+
+    conn.close()
+
+    return render_template(
+        "index.html",
+        progress=round(progress,2),
+        streak=streak,
+        xp=xp,
+        level=level,
+        xp_progress=xp % 100,
+        days_left=days_left,
+        data30=data30,
+        data60=data60,
+        data90=data90,
+        incomplete_tasks=incomplete_tasks
+    )
 
 # ---------------- AUTH ----------------
 @app.route("/signup", methods=["GET", "POST"])
