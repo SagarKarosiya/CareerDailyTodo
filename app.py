@@ -1,7 +1,7 @@
 import os
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
-from datetime import date, datetime
+from datetime import date
 import schedule
 import time
 import threading
@@ -85,13 +85,6 @@ def init_db():
 
     conn.commit()
     conn.close()
-    
-# ---------------- Home  ----------------
-@app.route("/")
-def home():
-    if current_user.is_authenticated:
-        return redirect("/index")  # logged in user
-    return redirect("/login")           # not logged in
 
 # ---------------- LOAD USER ----------------
 @login_manager.user_loader
@@ -127,6 +120,13 @@ def run_scheduler():
         schedule.run_pending()
         time.sleep(60)
 
+# ---------------- ROUTES ----------------
+
+# 🏠 HOME (Landing Page)
+@app.route("/")
+def home():
+    return render_template("index.html")
+
 # ---------------- AUTH ----------------
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -149,7 +149,7 @@ def signup():
             return "User already exists!"
 
         conn.close()
-        return redirect("/login")
+        return redirect(url_for("login"))
 
     return render_template("signup.html")
 
@@ -168,7 +168,7 @@ def login():
 
         if user and check_password_hash(user[3], password):
             login_user(User(user[0], user[1], user[2]))
-            return redirect("/dashboard")
+            return redirect(url_for("home"))  # 👈 Redirect to index
 
         return "Invalid credentials!"
 
@@ -178,7 +178,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect("/login")
+    return redirect(url_for("home"))
 
 # ---------------- TASKS ----------------
 @app.route("/tasks", methods=["GET", "POST"])
@@ -214,7 +214,7 @@ def done(id):
     conn.commit()
     conn.close()
 
-    return redirect("/tasks")
+    return redirect(url_for("tasks"))
 
 # ---------------- LEARNING ----------------
 @app.route("/learning", methods=["GET", "POST"])
