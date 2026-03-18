@@ -1,9 +1,6 @@
-os 
 Flask
-psycopg2
+psycopg2-binary
+python-dotenv
+flask-login
 schedule
-time
-date
-threading
 Werkzeug
-requests
