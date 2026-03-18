@@ -1,0 +1,9 @@
+os 
+Flask
+psycopg2
+schedule
+time
+date
+threading
+Werkzeug
+requests
