@@ -268,4 +268,4 @@ def dashboard():
 if __name__ == "__main__":
     init_db()
     threading.Thread(target=run_scheduler, daemon=True).start()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)
