@@ -19,7 +19,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
- DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 # If you didn't change anything during installation, 
 # the default user is usually 'postgres'
 #DATABASE_URL = "postgresql://postgres:704948@localhost:5432/postgres"
