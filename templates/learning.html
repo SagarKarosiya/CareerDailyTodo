@@ -1,94 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Learning</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <title>Learning Tracker | Focus90</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #38bdf8;
+            --bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: var(--bg); color: white; min-height: 100vh;
+            padding: 40px 20px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* Navigation */
+        .header-nav {
+            width: 100%; max-width: 1100px; display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 30px;
+        }
+        h1 { background: linear-gradient(90deg, var(--secondary), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; }
+        .btn-back { text-decoration: none; color: #94a3b8; border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 12px; transition: 0.3s; background: var(--glass); }
+        .btn-back:hover { background: rgba(255, 255, 255, 0.1); color: white; transform: translateX(-5px); }
+
+        /* Stats Bar */
+        .stats-bar { width: 100%; max-width: 1100px; display: flex; gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            flex: 1; background: var(--glass); padding: 20px; border-radius: 20px;
+            border: 1px solid var(--glass-border); transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
+
+        /* Glass Form */
+        .glass-form {
+            background: var(--glass); backdrop-filter: blur(12px); padding: 25px;
+            border-radius: 24px; width: 100%; max-width: 1100px; border: 1px solid var(--glass-border); margin-bottom: 40px;
+        }
+        .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; align-items: center; }
+        input, select { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); color: white; padding: 12px; border-radius: 12px; outline: none; }
+        .btn-add { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-add:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* Sections & Cards */
+        .section-title { width: 100%; max-width: 1100px; margin: 40px 0 20px; color: #94a3b8; font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+        .cards-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; max-width: 1100px; }
+        .card { background: var(--glass); border: 1px solid var(--glass-border); padding: 20px; border-radius: 18px; transition: 0.3s; }
+        .card:hover { background: rgba(255,255,255,0.06); transform: translateY(-5px); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card b { color: var(--secondary); }
+        .btn-delete { text-decoration: none; opacity: 0.4; transition: 0.3s; }
+        .btn-delete:hover { opacity: 1; transform: scale(1.2); }
+
+        /* Analytics */
+        .analytics-container { width: 100%; max-width: 1100px; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; margin-top: 50px; }
+        .chart-box { background: var(--glass); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; }
+        
+        footer { margin: 60px 0 20px; color: #64748b; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
 
-<h1>📘 Learning Tracker</h1>
-
-<form method="POST">
-  <input type="text" name="topic" placeholder="Course Name" required>
-  <input type="number" name="hours" placeholder="Hours" step="0.5" required>
-
-  <select name="platform" required>
-    <option value="">Select Platform</option>
-    <option value="Coursera">Coursera</option>
-    <option value="Great Learning">Great Learning</option>
-    <option value="LinkedIn Learning">LinkedIn Learning</option>
-  </select>
-
-  <button>Add</button>
-</form>
-
-<!-- Sections -->
-<h2>🎓 Coursera</h2>
-<div class="cards">
-  {% for d in data %}
-    {% if d[3] == "Coursera" %}
-    <div class="card">
-      <b>{{ d[1] }}</b><br>
-      Hours: {{ d[2] }}
+    <div class="header-nav">
+        <h1>📘 Learning Tracker</h1>
+        <a href="/index" class="btn-back">⬅Home</a>
     </div>
-    {% endif %}
-  {% endfor %}
-</div>
 
-<h2>📘 Great Learning</h2>
-<div class="cards">
-  {% for d in data %}
-    {% if d[3] == "Great Learning" %}
-    <div class="card">
-      <b>{{ d[1] }}</b><br>
-      Hours: {{ d[2] }}
+    <div class="stats-bar">
+        <div class="stat-card" style="border-left: 4px solid var(--secondary);">
+            <p style="text-transform: uppercase; letter-spacing: 1px; font-size: 11px; color: var(--secondary);">Total Learning Time</p>
+            <h2 style="font-size: 1.8rem; margin-top: 5px;">{{ total_time }} <span style="font-size: 0.9rem; color: #94a3b8;">hrs</span></h2>
+        </div>
+        
+        <div class="stat-card" style="border-left: 4px solid var(--primary);">
+            <p style="text-transform: uppercase; letter-spacing: 1px; font-size: 11px; color: var(--primary);">Courses Tracked</p>
+            <h2 style="font-size: 1.8rem; margin-top: 5px;">{{ data|length }} <span style="font-size: 0.9rem; color: #94a3b8;">topics</span></h2>
+        </div>
     </div>
-    {% endif %}
-  {% endfor %}
-</div>
 
-<h2>💼 LinkedIn Learning</h2>
-<div class="cards">
-  {% for d in data %}
-    {% if d[3] == "LinkedIn Learning" %}
-    <div class="card">
-      <b>{{ d[1] }}</b><br>
-      Hours: {{ d[2] }}
+    <div class="glass-form">
+        <form method="POST" class="form-grid">
+            <input type="text" name="topic" placeholder="Course Name (e.g. React Mastery)" required>
+            <input type="number" name="hours" placeholder="Hours" step="0.5" required>
+            <select name="platform" required>
+                <option value="">Select Platform</option>
+                <option value="Coursera">Coursera</option>
+                <option value="Great Learning">Great Learning</option>
+                <option value="LinkedIn Learning">LinkedIn Learning</option>
+                <option value="Other">Other</option>
+            </select>
+            <button class="btn-add">Add Course</button>
+        </form>
     </div>
-    {% endif %}
-  {% endfor %}
-</div>
 
-<h2>📊 Platform Analytics</h2>
+    {% set platforms = [('Coursera', '🎓'), ('Great Learning', '📘'), ('LinkedIn Learning', '💼'), ('Other', '📁')] %}
+    
+    {% for platform_name, emoji in platforms %}
+        {% set platform_data = data | selectattr(2, 'equalto', platform_name) | list %}
+        {% if platform_data %}
+        <h2 class="section-title">{{ emoji }} {{ platform_name }}</h2>
+        <div class="cards-container">
+            {% for d in platform_data %}
+            <div class="card">
+                <div class="card-header">
+                    <b>{{ d[0] }}</b>
+                    <a href="/delete_learning/{{ d[0] }}" class="btn-delete" onclick="return confirm('Remove this course?')">🗑️</a>
+                </div>
+                <p style="margin-top: 8px;">⏱ {{ d[1] }} Hours</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endfor %}
 
-<div class="card">
-  <canvas id="platformChart"></canvas>
-</div>
+    <div class="analytics-container">
+        <div class="chart-box">
+            <h3 style="margin-bottom: 25px;">📊 Platform Distribution</h3>
+            <div style="max-width: 300px; width: 100%;">
+                <canvas id="platformChart"></canvas>
+            </div>
+        </div>
+        <div style="background: var(--glass); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border);">
+            <h3 style="color: var(--secondary);">Learning Tip 💡</h3>
+            <p style="color: #94a3b8; margin-top: 15px; line-height: 1.6;">
+                Consistency beats intensity. 30 minutes every day is more effective than 5 hours once a week. 
+                Keep your momentum going!
+            </p>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <footer>
+        <p>© 2026 Sagar Karosiya | Focus90 Portfolio</p>
+    </footer>
 
-<script>
-  const ctx = document.getElementById('platformChart');
+    <script>
+        const ctx = document.getElementById('platformChart').getContext('2d');
+        const labels = {{ labels | default([]) | tojson }};
+        const values = {{ values | default([]) | tojson }};
 
-  new Chart(ctx, {
- /*   type: 'bar',  */
-    type: 'pie',
-    data: {
-      labels: {{ labels | tojson }},
-      datasets: [{
-        label: 'Hours Spent',
-        data: {{ values | tojson }}
-      }]
-    }
-  });
-</script>
-
-
-<!-- FOOTER -->
-<footer>
-    <p>© 2026 Sagar Karosiya | Portfolio</p>
-</footer>
-
-
+        if (labels.length > 0) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#6366f1', '#38bdf8', '#fbbf24', '#f87171', '#a78bfa'],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Poppins' } } }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

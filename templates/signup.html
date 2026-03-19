@@ -6,60 +6,93 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #141e30, #243b55);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        overflow: hidden;
+    }
 
-.container {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
-    padding: 40px;
-    width: 350px;
-    color: white;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    text-align: center;
-}
+    .container {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 40px;
+        width: 380px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        text-align: center;
+        z-index: 1;
+    }
 
-h2 {
-    margin-bottom: 20px;
-}
+    h2 { margin-bottom: 25px; font-weight: 600; }
 
-input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-}
+    input {
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+        outline: none;
+        transition: 0.3s;
+    }
 
-button {
-    width: 100%;
-    padding: 12px;
-    background: #ff7e5f;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
+    input:focus {
+        background: rgba(255,255,255,0.1);
+        border-color: #6366f1;
+    }
 
-button:hover {
-    background: #feb47b;
-}
+    button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(90deg, #6366f1, #22d3ee);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
 
-a {
-    color: #ff7e5f;
-    text-decoration: none;
-}
+    button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+
+    .alert {
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        background-color: rgba(239, 68, 68, 0.15);
+        border: 1px solid #ef4444;
+        color: #f87171;
+        font-size: 13px;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+        position: absolute;
+        bottom: 20px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    p { margin-top: 20px; color: #94a3b8; font-size: 14px; }
+    a { color: #38bdf8; text-decoration: none; font-weight: 600; }
 </style>
 </head>
 
@@ -68,20 +101,44 @@ a {
 <div class="container">
     <h2>Create Account 🚀</h2>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-container">
+          {% for category, message in messages %}
+            <div class="alert" id="flash-message">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <form method="POST">
         <input name="username" placeholder="Username" required>
-        <input type="email" name="email" placeholder="Email" required>
+        <input type="email" name="email" placeholder="Email Address" required>
         <input type="password" name="password" placeholder="Password" required>
-        <button>Signup</button>
+        <button type="submit">Signup</button>
     </form>
 
     <p>Already have an account? <a href="/login">Login</a></p>
 </div>
-    
-<!-- FOOTER -->
+
 <footer>
     <p>© 2026 Sagar Karosiya | Portfolio</p>
 </footer>
+
+<script>
+    window.onload = function() {
+        const flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            setTimeout(() => {
+                flashMessage.style.transition = "opacity 0.5s ease";
+                flashMessage.style.opacity = "0";
+                setTimeout(() => flashMessage.remove(), 500);
+            }, 5000); 
+        }
+    };
+</script>
     
 </body>
 </html>

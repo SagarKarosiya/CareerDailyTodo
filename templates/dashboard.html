@@ -1,68 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <title>Dashboard | Focus90</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Top Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        header h1 {
+            font-size: 24px;
+            background: linear-gradient(90deg, #38bdf8, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-btns { display: flex; gap: 15px; }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-home { color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-home:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-logout:hover { background: #ef4444; color: white; }
+
+        /* Dashboard Grid */
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        h2 { margin: 30px 0 15px; font-size: 20px; color: #cbd5e1; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
+        .card b { font-size: 28px; display: block; margin-top: 5px; color: #38bdf8; }
+
+        /* Progress Bars */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #22d3ee);
+            transition: width 1s ease-in-out;
+        }
+
+        /* Goal Form */
+        .goal-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="date"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            outline: none;
+            flex: 1;
+        }
+
+        .btn-set {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        footer { text-align: center; margin-top: 50px; color: #64748b; font-size: 14px; }
+    </style>
 </head>
 <body>
 
-<h1>📊 Dashboard</h1>
+<div class="container">
+    <header>
+        <h1>📊 Dashboard</h1>
+        <div class="nav-btns">
+            <a href="/" class="btn btn-home">⬅ Back Home</a>
+            <a href="/logout" class="btn btn-logout">Logout</a>
+        </div>
+    </header>
 
-<!-- MAIN STATS -->
-<div class="cards">
-  <div class="card">Completion<br><b>{{completion}}%</b></div>
-  <div class="card">Learning Hours<br><b>{{total_hours}}</b></div>
-  <div class="card">🔥 Streak<br><b>{{streak}}</b></div>
+    <div class="cards">
+        <div class="card">Completion<b>{{completion}}%</b></div>
+        <div class="card">Learning Hours<b>{{total_hours}}</b></div>
+        <div class="card">🔥 Streak<b>{{streak}}</b></div>
+    </div>
+
+    <h2>🎮 Gamification</h2>
+    <div class="cards">
+        <div class="card">XP Points<b>{{xp}}</b></div>
+        <div class="card">Current Level<b>{{level}}</b></div>
+    </div>
+
+    <div class="progress-container">
+        <p>Level Progress: {{xp % 100}} / 100 XP</p>
+        <div class="progress-bar">
+            <div class="progress" style="width: {{xp % 100}}%"></div>
+        </div>
+    </div>
+
+    <h2>⏳ 90 Day Goal Tracker</h2>
+    <div class="progress-container">
+        <p>{{completion}}% overall goal completed | {{days_left}} days remaining</p>
+        <div class="progress-bar">
+            <div class="progress" style="width: {{completion}}%"></div>
+        </div>
+
+        <form method="POST" action="/set_goal" class="goal-form">
+            <input type="date" name="start" required>
+            <input type="date" name="end" required>
+            <button class="btn-set">Update Goal Period</button>
+        </form>
+    </div>
+
+   <footer>
+    © 2026 <a href="/credits" style="color: inherit; text-decoration: none;">SAGAR KAROSIYA</a> | BUILT FOR PERFORMANCE
+</footer>
 </div>
-
-<!-- GAMIFICATION -->
-<h2>🎮 Gamification</h2>
-<div class="cards">
-  <div class="card">XP<br><b>{{xp}}</b></div>
-  <div class="card">Level<br><b>{{level}}</b></div>
-</div>
-
-<div class="progress-bar">
-  <div class="progress" style="width: {{xp_progress}}%"></div>
-</div>
-<p>{{xp_progress}} / 100 XP to next level</p>
-
-<!-- GOAL -->
-<h2>⏳ 90 Day Goal</h2>
-<div class="progress-bar">
-  <div class="progress" style="width: {{progress}}%"></div>
-</div>
-<p>{{progress}}% completed | {{days_left}} days left</p>
-
-<form method="POST" action="/set_goal">
-  <input type="date" name="start" required>
-  <input type="date" name="end" required>
-  <button>Set Goal</button>
-</form>
-
 
 <script>
-function checkReminder() {
-  const now = new Date();
-  const hours = now.getHours();
-
-  // After 8 PM
-  if (hours >= 20) {
-    const incompleteTasks = {{ incomplete_tasks | default(0) }};
-
-    if (incompleteTasks > 0) {
-      alert("⚠️ You still have " + incompleteTasks + " tasks pending! Finish before day ends!");
+    // Browser Notifications logic
+    function checkReminder() {
+        const now = new Date();
+        if (now.getHours() >= 20) {
+            const incomplete = {{ incomplete_tasks | default(0) }};
+            if (incomplete > 0) {
+                alert("⚠️ Reminder: " + incomplete + " tasks pending! Don't break your streak.");
+            }
+        }
     }
-  }
-}
-
-// Check every minute
-setInterval(checkReminder, 60000);
+    setInterval(checkReminder, 60000);
 </script>
-
-
-<br>
-<a href="/">⬅ Back Home</a>
 
 </body>
 </html>

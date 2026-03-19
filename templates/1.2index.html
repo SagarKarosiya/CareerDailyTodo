@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus90 | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #38bdf8;
+            --bg: #0b0f1a;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #0b0f1a 50%);
+            padding-bottom: 100px;
+        }
+
+        .glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            filter: blur(140px); opacity: 0.15; z-index: -1; border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 900px; 
+            padding: 40px 24px; 
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header { text-align: center; transition: 0.5s; }
+        .welcome-msg { color: var(--secondary); font-size: 0.85rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+        h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 600; letter-spacing: -2px; margin-bottom: 10px; }
+        .hero-text h2 { font-size: 1.2rem; font-weight: 300; color: var(--text-dim); }
+
+        /* Navigation */
+        .nav-section { width: 100%; }
+        .menu-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; }
+        .menu-item {
+            background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 24px;
+            text-decoration: none; color: white; font-weight: 600; transition: 0.3s;
+            backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .menu-item:hover { background: rgba(99, 102, 241, 0.1); border-color: var(--primary); transform: translateY(-5px); }
+
+        /* Dashboard */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
+        .card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 28px; padding: 28px; transition: 0.3s ease; }
+        .full-width { grid-column: span 2; }
+
+        .card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .stat-value { font-size: 2.2rem; font-weight: 600; color: #fff; line-height: 1; }
+        .stat-unit { font-size: 0.9rem; color: var(--text-dim); margin-left: 5px; font-weight: 400; }
+        
+        .mini-info { font-size: 0.8rem; color: var(--text-dim); margin: 8px 0; font-weight: 400; }
+
+        .progress-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .progress { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); box-shadow: 0 0 15px var(--primary); }
+
+        .chart-card { height: 160px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; }
+        .trend-label { font-size: 0.7rem; padding: 4px 10px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; }
+
+        .achievements-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .badge { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; color: var(--secondary); }
+
+        .btn-start { margin-top: 30px; background: white; color: black; border: none; padding: 16px 45px; border-radius: 100px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-start:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.3); }
+
+        /* Mobile Bottom Nav */
+        .mobile-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; height: 70px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 35px;
+            display: none; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .nav-tab { text-decoration: none; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; font-size: 0.6rem; gap: 4px; }
+        .nav-tab.active { color: var(--secondary); }
+
+        /* Animations */
+        .hidden { display: none !important; }
+        .fade-out { opacity: 0; transform: scale(0.95); transition: 0.4s; }
+        .fade-in { animation: fadeIn 0.6s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive Fixes */
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .menu-stack { display: none; } /* Hide big menu on mobile */
+            .mobile-nav { display: flex; } /* Show bottom bar instead */
+            h1 { font-size: 2.8rem; }
+            .container { padding-bottom: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow" style="top: -10%; left: -10%; background: var(--primary);"></div>
+    <div class="glow" style="bottom: 10%; right: -5%; background: var(--secondary);"></div>
+
+    <div class="container">
+        
+        <header id="welcome-section">
+              <h2>Become Job Ready in 90 Days 🚀</h2>
+            <p>Track tasks, learning, streaks & dominate your goals</p>
+            <h1>Focus90</h1>
+            <div class="hero-text">
+                <h2>Welcome back, {{ current_user.username }}</h2>
+            </div>
+            <button class="btn-start" onclick="toggleMenu()">Enter Dashboard</button>
+        </header>
+
+        <div id="nav-menu" class="hidden nav-section">
+            <div class="menu-stack">
+                <a href="/tasks" class="menu-item"><span>📋</span>Tasks</a>
+                <a href="/learning" class="menu-item"><span>📘</span>Learning</a>
+                <a href="/dashboard" class="menu-item"><span>📊</span>Analytics</a>
+            </div>
+
+            <div class="dashboard-grid fade-in">
+                <div class="card full-width">
+                    <h3>📊 Mastery Progress</h3>
+                    <div class="stat-value">{{progress}}<span class="stat-unit">% Complete</span></div>
+                    <div class="progress-bar"><div class="progress" style="width: {{progress}}%"></div></div>
+                </div>
+
+                <div class="card">
+                    <h3>🔥 Current Streak</h3>
+                    <div class="stat-value">{{streak}}<span class="stat-unit">Days</span></div>
+                </div>
+
+                <div class="card">
+                    <h3>⏳ Remaining</h3>
+                    <div class="stat-value">{{days_left}}<span class="stat-unit">Days</span></div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Task Overview</h3>
+                    <div class="stat-value">
+                        {{ total_tasks - completed_tasks }}<span class="stat-unit">Left</span>
+                    </div>
+                    <div class="mini-info">Total: {{ total_tasks | default(0) }}</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: {{ (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📘 Learning Modules</h3>
+                    <div class="stat-value">
+                        {{ total_learning - completed_learning }}<span class="stat-unit">Left</span>
+                    </div>
+                    <div class="mini-info">Total: {{ total_learning | default(0) }}</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: {{ (completed_learning / total_learning * 100) if total_learning > 0 else 0 }}%; background: var(--secondary);"></div>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>📈 30D Trend</h3>
+                        <span class="trend-label">+12%</span>
+                    </div>
+                    <canvas id="chart30"></canvas>
+                </div>
+
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h3>📊 90D Trend</h3>
+                        <span class="trend-label" style="background: rgba(56, 189, 248, 0.1); color: var(--secondary);">Stable</span>
+                    </div>
+                    <canvas id="chart90"></canvas>
+                </div>
+
+                <div class="card full-width">
+                    <h3>🎮 Level: {{level}}</h3>
+                    <div class="stat-value">{{xp}}<span class="stat-unit">XP Earned</span></div>
+                    <div class="progress-bar"><div class="progress" style="width: {{xp_progress}}%"></div></div>
+                </div>
+
+                <div class="card full-width">
+                    <h3>🏆 Achievements</h3>
+                    <div class="achievements-list">
+                        {% if streak >= 7 %}<div class="badge">🔥 7-Day Burn</div>{% endif %}
+                        {% if streak >= 30 %}<div class="badge">💎 Consistent</div>{% endif %}
+                        {% if xp >= 500 %}<div class="badge">⚔️ Warrior</div>{% endif %}
+                        {% if progress >= 100 %}<div class="badge">👑 Graduate</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 SAGAR KAROSIYA | BUILT FOR PERFORMANCE</p>
+        </footer>
+    </div>
+
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="/" class="nav-tab active"><span>🏠</span>Home</a>
+        <a href="/tasks" class="nav-tab"><span>📋</span>Tasks</a>
+        <a href="/learning" class="nav-tab"><span>📘</span>Learn</a>
+        <a href="/dashboard" class="nav-tab"><span>📊</span>Stats</a>
+    </nav>
+
+    <script>
+        function toggleMenu() {
+            const welcome = document.getElementById('welcome-section');
+            const menu = document.getElementById('nav-menu');
+            const mobileNav = document.getElementById('mobile-nav');
+            
+            welcome.classList.add('fade-out');
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                menu.classList.remove('hidden');
+                menu.classList.add('fade-in');
+                if(window.innerWidth <= 768) mobileNav.style.display = 'flex';
+                
+                // Initialize Charts after showing the container
+                createChart('chart30', '#38bdf8', {{data30 | default([10, 25, 45, 30, 60, 80])}});
+                createChart('chart90', '#6366f1', {{data90 | default([5, 15, 10, 35, 50, 75, 100])}});
+            }, 400);
+        }
+
+        function createChart(id, color, dataPoints) {
+            const canvas = document.getElementById(id);
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 100);
+            gradient.addColorStop(0, color + '44');
+            gradient.addColorStop(1, color + '00');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataPoints.map((_, i) => i + 1),
+                    datasets: [{
+                        data: dataPoints,
+                        borderColor: color,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.45,
+                        fill: true,
+                        backgroundColor: gradient
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

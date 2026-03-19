@@ -1,261 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Focus90 Ultra Premium</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus90 | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #38bdf8;
+            --bg: #0b0f1a;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-dim: #94a3b8;
+        }
 
-    body {
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      padding: 20px 50px;
-      align-items: center;
-    }
+        body {
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #0b0f1a 50%);
+            padding-bottom: 100px;
+        }
 
-    header h1 {
-      font-size: 28px;
-      font-weight: 600;
-      background: linear-gradient(90deg, #38bdf8, #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        .container { 
+            width: 100%; 
+            max-width: 900px; 
+            margin: 0 auto;
+            padding: 40px 24px; 
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
 
-    nav a {
-      margin-left: 20px;
-      color: #cbd5f5;
-      text-decoration: none;
-      transition: 0.3s;
-    }
+        .menu-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; margin-bottom: 10px; }
+        .menu-item {
+            background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 24px;
+            text-decoration: none; color: white; font-weight: 600; transition: 0.3s;
+            backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .menu-item:hover { background: rgba(99, 102, 241, 0.1); border-color: var(--primary); transform: translateY(-5px); }
 
-    nav a:hover {
-      color: white;
-    }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; }
+        .card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 28px; padding: 28px; }
+        .full-width { grid-column: span 2; }
 
-    .hero {
-      text-align: center;
-      padding: 100px 20px;
-      animation: fadeIn 1.5s ease-in-out;
-    }
+        .stat-label { color: var(--text-dim); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; display: block; }
+        .stat-value { font-size: 2.2rem; font-weight: 600; color: #fff; line-height: 1; }
+        .stat-unit { font-size: 0.9rem; color: var(--text-dim); margin-left: 5px; }
+        
+        .sub-stat { font-size: 0.8rem; color: var(--text-dim); margin-top: 8px; }
+        .sub-stat strong { color: white; }
 
-    .hero h2 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
+        .progress-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        .progress { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); transition: width 0.5s ease; }
 
-    .hero p {
-      color: #94a3b8;
-      margin-bottom: 30px;
-    }
+        /* Goal Switcher Styling */
+        .analytics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .goal-select {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
 
-    .btn {
-      padding: 12px 25px;
-      border-radius: 30px;
-      background: linear-gradient(90deg, #6366f1, #22d3ee);
-      border: none;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 20px rgba(99,102,241,0.5);
-    }
+        .chart-card { height: 160px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .mobile-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; height: 70px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .nav-tab { text-decoration: none; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; }
 
-    .btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(34,211,238,0.7);
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 50px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 25px;
-      transition: 0.3s;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-
-    .progress-bar {
-      height: 12px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-
-    .progress {
-      height: 100%;
-      background: linear-gradient(90deg, #22d3ee, #6366f1);
-      animation: load 2s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(20px);} 
-      to {opacity: 1; transform: translateY(0);} 
-    }
-
-    @keyframes load {
-      from {width: 0;} 
-    }
-
-  </style>
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .menu-stack { display: none; }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="menu-stack">
+            <a href="/tasks" class="menu-item"><span>📋</span>Tasks</a>
+            <a href="/learning" class="menu-item"><span>📘</span>Learning</a>
+            <a href="/dashboard" class="menu-item"><span>📊</span>Analytics</a>
+        </div>
 
-<header>
-  <h1>Focus90</h1>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/dashboard">Dashboard</a>
-    <a href="/tasks">Tasks</a>
-    <a href="/learning">Learning</a>
-  </nav>
-</header>
+        <div class="dashboard-grid">
+            <div class="card full-width">
+                <div class="analytics-header">
+                    <span class="stat-label">📊 Overall Progress ({{ active_goal | default('Current Goal') }})</span>
+                    <select class="goal-select" onchange="window.location.href='?goal=' + this.value">
+                        <option value="90day" selected>90-Day Mastery</option>
+                        <option value="career">Career Pivot</option>
+                        <option value="project">Project X Launch</option>
+                    </select>
+                </div>
+                <div class="stat-value">{{ progress | default(0) }}<span class="stat-unit">%</span></div>
+                <div class="progress-bar"><div class="progress" style="width: {{ progress | default(0) }}%"></div></div>
+            </div>
 
-<section class="hero">
-  <h2>Become Job Ready in 90 Days 🚀</h2>
-  <p>Track tasks, learning, streaks & dominate your goals</p>
-  <a href="/dashboard"><button class="btn">Start Now</button></a>
-</section>
+            <div class="card">
+                <span class="stat-label">📋 Task Tracker</span>
+                <div class="stat-value">
+                    {{ (total_tasks|default(0)) - (completed_tasks|default(0)) }}
+                    <span class="stat-unit">Left</span>
+                </div>
+                <div class="sub-stat">Total Tasks: <strong>{{ total_tasks|default(0) }}</strong></div>
+                <div class="progress-bar">
+    {% if total_tasks and total_tasks > 0 %}
+        <div class="progress" style="width: {{ (completed_tasks / total_tasks * 100) }}%"></div>
+    {% else %}
+        <div class="progress" style="width: 0%"></div>
+    {% endif %}
+</div>
+            </div>
 
-<section class="cards">
-  <div class="card">
-    <h3>📊 Progress</h3>
-    <p>{{progress}}% Completed</p>
-    <div class="progress-bar">
-      <div class="progress" style="width: {{progress}}%"></div>
-    </div>
-  </div>
+            <div class="card">
+                <span class="stat-label">📘 Learning Progress</span>
+                <div class="stat-value">
+                    {{ (total_learning|default(0)) - (completed_learning|default(0)) }}
+                    <span class="stat-unit">Left</span>
+                </div>
+                <div class="sub-stat">Topics Explored: <strong>{{ total_learning|default(0) }}</strong></div>
+                <div class="progress-bar">
+    {% if total_learning and total_learning > 0 %}
+        <div class="progress" style="width: {{ (completed_learning / total_learning * 100) }}%; background: var(--secondary);"></div>
+    {% else %}
+        <div class="progress" style="width: 0%"></div>
+    {% endif %}
+</div>
+            </div>
 
-  <div class="card">
-    <h3>🔥 Streak</h3>
-    <p>{{streak}} Days</p>
-  </div>
+            <div class="card chart-card">
+                <span class="stat-label">📈 30-Day Activity</span>
+                <canvas id="chart30"></canvas>
+            </div>
+            <div class="card chart-card">
+                <span class="stat-label">📊 90-Day Velocity</span>
+                <canvas id="chart90"></canvas>
+            </div>
+        </div>
 
-  <div class="card">
-    <h3>🎮 XP</h3>
-    <p>{{xp}} XP | Level {{level}}</p>
-    <div class="progress-bar">
-      <div class="progress" style="width: {{xp_progress}}%"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>⏳ Goal</h3>
-    <p>{{days_left}} Days Left</p>
-  </div>
-</section>
-
-
-<section class="cards">
-  <div class="card">
-    <h3>📈 Last 30 Days</h3>
-    <canvas id="chart30"></canvas>
-  </div>
-
-  <div class="card">
-    <h3>📊 Last 60 Days</h3>
-    <canvas id="chart60"></canvas>
-  </div>
-
-  <div class="card">
-    <h3>📉 Last 90 Days</h3>
-    <canvas id="chart90"></canvas>
-  </div>
-</section>
-
-<section class="cards">
-  <div class="card">
-    <h3>🏆 Achievements</h3>
-    <ul>
-      {% if streak >= 7 %}
-      <li>🔥 7 Day Streak</li>
-      {% endif %}
-      {% if streak >= 30 %}
-      <li>💪 30 Day Consistency</li>
-      {% endif %}
-      {% if xp >= 500 %}
-      <li>🎮 500 XP Master</li>
-      {% endif %}
-      {% if progress >= 100 %}
-      <li>🚀 Goal Completed</li>
-      {% endif %}
-    </ul>
-  </div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  function createChart(id, dataPoints) {
-    new Chart(document.getElementById(id), {
-      type: 'line',
-      data: {
-        labels: dataPoints.map((_, i) => i+1),
-        datasets: [{
-          label: 'Progress',
-          data: dataPoints
-        }]
-      }
-    });
-  }
-
-  createChart('chart30', {{data30}});
-  createChart('chart60', {{data60}});
-  createChart('chart90', {{data90}});
-</script>
-
-<script>
-if (Notification.permission !== "granted") {
-  Notification.requestPermission();
-}
-
-function checkReminder() {
-  const now = new Date();
-  const hours = now.getHours();
-
-  if (hours >= 20) {
-    const incompleteTasks = {{ incomplete_tasks | default(0) }};
-
-    if (incompleteTasks > 0) {
-      new Notification("⚠️ Focus90 Reminder", {
-        body: "You have " + incompleteTasks + " pending tasks!"
-      });
-    }
-  }
-}
-
-setInterval(checkReminder, 60000);
-</script>
-
-<!-- FOOTER -->
-<footer>
-    <p>© 2026 Sagar Karosiya | Portfolio</p>
+        <footer>
+    © 2026 <a href="/credits" style="color: inherit; text-decoration: none;">SAGAR KAROSIYA</a> | BUILT FOR PERFORMANCE
 </footer>
+    </div>
 
+    <nav class="mobile-nav">
+        <a href="/" class="nav-tab"><span>🏠</span>Home</a>
+        <a href="/tasks" class="nav-tab"><span>📋</span>Tasks</a>
+        <a href="/learning" class="nav-tab"><span>📘</span>Learn</a>
+        <a href="/dashboard" class="nav-tab"><span>📊</span>Stats</a>
+    </nav>
 
+    <script>
+        window.onload = function() {
+            const d30 = {{ data30 | tojson | safe if data30 else '[10, 25, 45, 30, 60, 80]' }};
+            const d90 = {{ data90 | tojson | safe if data90 else '[5, 15, 10, 35, 50, 75, 100]' }};
+            createChart('chart30', '#38bdf8', d30);
+            createChart('chart90', '#6366f1', d90);
+        };
+
+        function createChart(id, color, dataPoints) {
+            const ctx = document.getElementById(id).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dataPoints.map((_, i) => i + 1),
+                    datasets: [{
+                        data: dataPoints,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        backgroundColor: color + '22'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
